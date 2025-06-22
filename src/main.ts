@@ -1,7 +1,7 @@
 class SessionStorage {
     static set(key: string, value: any): void {
         const item: SessionStorageItem = {
-            data: value instanceof Function ? value() : value,
+            data  : value instanceof Function ? value() : value,
         };
 
         sessionStorage.setItem(key, JSON.stringify(item));
