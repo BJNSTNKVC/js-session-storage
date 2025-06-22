@@ -1,0 +1,3 @@
+type SessionStorageItem = {
+    data: any,
+};
