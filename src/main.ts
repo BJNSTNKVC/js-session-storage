@@ -1,3 +1,5 @@
+import { SessionStorageItem } from './types';
+
 class SessionStorage {
     static set(key: string, value: any): void {
         const item: SessionStorageItem = {
