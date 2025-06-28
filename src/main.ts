@@ -1,6 +1,8 @@
-import { SessionStorageItem } from './types';
+type SessionStorageItem = {
+    data: any,
+};
 
-class SessionStorage {
+export class SessionStorage {
     static set(key: string, value: any): void {
         const item: SessionStorageItem = {
             data  : value instanceof Function ? value() : value,
@@ -152,13 +154,10 @@ class SessionStorage {
     }
 }
 
-if (typeof exports != 'undefined') {
-    module.exports.SessionStorage = SessionStorage;
+if (typeof window !== 'undefined') {
+    (window as any).SessionStorage = SessionStorage;
 }
 
-// Hack to test this code, global is not available in the browser.
 if (typeof global !== 'undefined') {
-    const _global: any = global;
-
-    _global.SessionStorage = SessionStorage;
+    (global as any).SessionStorage = SessionStorage;
 }
