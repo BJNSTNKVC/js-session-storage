@@ -1,10 +1,11 @@
 {
   "name": "@bjnstnkvc/session-storage",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Simple wrapper for JavaScript Session Storage API.",
   "type": "module",
   "main": "lib/main.js",
   "source": "src/main.ts",
+  "types": "src/main.ts",
   "exports": {
     ".": {
       "import": "./lib/main.esm.js",
