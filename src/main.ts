@@ -1,11 +1,17 @@
-type SessionStorageItem = {
+export type SessionStorageItem = {
     data: any,
 };
 
 export class SessionStorage {
+    /**
+     * Set the key to the Storage object.
+     *
+     * @param { string } key String containing the name of the key you want to create.
+     * @param { * } value String containing the value of the key you want to create.
+     */
     static set(key: string, value: any): void {
         const item: SessionStorageItem = {
-            data  : value instanceof Function ? value() : value,
+            data: value instanceof Function ? value() : value,
         };
 
         sessionStorage.setItem(key, JSON.stringify(item));
@@ -30,7 +36,7 @@ export class SessionStorage {
             const item: SessionStorageItem = JSON.parse(storageItem);
 
             return item.data ?? item;
-        } catch (error) {
+        } catch {
             return storageItem;
         }
     }
@@ -44,13 +50,13 @@ export class SessionStorage {
      * @return { any }
      */
     static remember(key: string, callback: Function): any {
-        const item: string | null = SessionStorage.get(key);
+        const item: string | null = this.get(key);
 
         if (item === null) {
-            SessionStorage.set(key, callback);
+            this.set(key, callback);
         }
 
-        return item ?? SessionStorage.get(key);
+        return item ?? this.get(key);
     }
 
     /**
@@ -58,14 +64,8 @@ export class SessionStorage {
      *
      * @return { object }
      */
-    static all(): object {
-        const storage: object | any = { ...sessionStorage };
-
-        for (const item in storage) {
-            storage[item] = SessionStorage.get(item);
-        }
-
-        return storage;
+    static all(): Record<string, any> {
+        return Object.fromEntries(Object.keys(sessionStorage).map((key: string): [string, any] => [key, this.get(key)]));
     }
 
     /**
@@ -92,7 +92,7 @@ export class SessionStorage {
      * @return { boolean }
      */
     static has(key: string): boolean {
-        return !!SessionStorage.get(key);
+        return !!this.get(key);
     }
 
     /**
@@ -102,10 +102,16 @@ export class SessionStorage {
      *
      * @return { boolean }
      */
-    static hasAny(keys: string | string[]): boolean {
-        keys = keys instanceof Array ? keys : [...arguments];
+    static hasAny(...keys: [string | string[]] | string[]): boolean {
+        if (keys.length === 1) {
+            if (Array.isArray(keys[0])) {
+                keys = keys[0];
+            } else {
+                keys = [keys[0]];
+            }
+        }
 
-        return keys.filter((key: string) => SessionStorage.has(key)).length > 0;
+        return keys.some((key: string): boolean => this.has(key));
     }
 
     /**
@@ -114,7 +120,7 @@ export class SessionStorage {
      * @return { boolean }
      */
     static isEmpty(): boolean {
-        return Object.keys(SessionStorage.all()).length === 0;
+        return Object.keys(this.all()).length === 0;
     }
 
     /**
@@ -123,7 +129,7 @@ export class SessionStorage {
      * @return { boolean }
      */
     static isNotEmpty(): boolean {
-        return !SessionStorage.isEmpty();
+        return !this.isEmpty();
     }
 
     /**
@@ -150,7 +156,7 @@ export class SessionStorage {
      * @param { string } key String containing the name of the key you want to dump.
      */
     static dump(key: string): void {
-        console.log(SessionStorage.get(key));
+        console.log(this.get(key));
     }
 }
 
