@@ -1,7 +1,13 @@
-// @ts-nocheck
-require('../src/main');
+import { SessionStorage, SessionStorageItem } from '../src/main';
 
 class Storage {
+    /**
+     * The underlying data store that maintains all key-value pairs in memory.
+     *
+     * @type { Record<string, any> }
+     */
+    public store: Record<string, any>;
+
     /**
      * Create a new Storage object.
      */
@@ -34,7 +40,7 @@ class Storage {
      * @param { string } keyName
      * @param { string } keyValue
      */
-    setItem(keyName: string, keyValue: string) {
+    setItem(keyName: string, keyValue: string): void {
         this.store[keyName] = keyValue;
     }
 
@@ -43,21 +49,19 @@ class Storage {
      *
      * @param { string } keyName
      */
-    removeItem(keyName: string) {
+    removeItem(keyName: string): void {
         delete this.store[keyName];
     }
 
     /**
      * When invoked, will empty all keys out of the storage.
      */
-    clear() {
+    clear(): void {
         this.store = {};
     }
 }
 
-const _global: any = global;
-
-_global.sessionStorage = new Storage;
+(global as any).sessionStorage = new Storage;
 
 beforeEach((): void => {
     sessionStorage.clear();
@@ -67,15 +71,15 @@ describe('SessionStorage.set', (): void => {
     test('sets the key to the Storage object', (): void => {
         SessionStorage.set('$key', '$value');
 
-        const item: SessionStorageItem = JSON.parse(sessionStorage.getItem('$key'));
+        const item: SessionStorageItem = JSON.parse(sessionStorage.getItem('$key') as string) as SessionStorageItem;
 
-        expect(item.data).toEqual('$value');
+            expect(item.data).toEqual('$value');
     });
 
     test('sets the key with a function value to the Storage object', (): void => {
         SessionStorage.set('$key', (): string => '$value');
 
-        const item: SessionStorageItem = JSON.parse(sessionStorage.getItem('$key'));
+        const item: SessionStorageItem = JSON.parse(sessionStorage.getItem('$key') as string) as SessionStorageItem;
 
         expect(item.data).toEqual('$value');
     });
@@ -142,7 +146,7 @@ describe('SessionStorage.all', (): void => {
 
         SessionStorage.set(key2, value2);
 
-        const items: object = SessionStorage.all();
+        const items: Record<string, any> = SessionStorage.all();
 
         expect(items[key1]).toEqual(value1);
         expect(items[key2]).toEqual(value2);
