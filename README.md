@@ -85,13 +85,16 @@ SessionStorage.remember('key', () => 'default');
 
 ### all
 
-Retrieve an object containing all keys and their associated values stored in the Session Storage.
+Retrieve an array containing all keys and their associated values stored in the Session Storage.
 
 #### Example
 
 ```javascript
 SessionStorage.all();
 ```
+
+> **Note:** The `all` method returns an array of objects with `key` and `value` properties (e.g. `[{ key: 'key', value: 'value' }]`)
+
 
 ### remove
 

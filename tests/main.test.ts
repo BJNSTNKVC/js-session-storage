@@ -146,10 +146,10 @@ describe('SessionStorage.all', (): void => {
 
         SessionStorage.set(key2, value2);
 
-        const items: Record<string, any> = SessionStorage.all();
+        const items: { key: string, value: any }[] = SessionStorage.all();
 
-        expect(items[key1]).toEqual(value1);
-        expect(items[key2]).toEqual(value2);
+        expect((items[0] as { key: string, value: any })).toEqual({ key: key1, value: value1 });
+        expect(items[1] as { key: string, value: any }).toEqual({ key: key2, value: value2 });
     });
 
     test('retrieves an empty object if Storage is empty', (): void => {
@@ -157,7 +157,7 @@ describe('SessionStorage.all', (): void => {
 
         const items: object = SessionStorage.all();
 
-        expect(items).toEqual({});
+        expect(items).toEqual([]);
     });
 });
 
