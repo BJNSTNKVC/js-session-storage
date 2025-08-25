@@ -62,10 +62,12 @@ export class SessionStorage {
     /**
      * Retrieves all items from the Storage object.
      *
-     * @return { object }
+     * @return { { key: string, value: any }[] }
      */
-    static all(): Record<string, any> {
-        return Object.fromEntries(Object.keys(sessionStorage).map((key: string): [string, any] => [key, this.get(key)]));
+    static all(): { key: string, value: any }[]  {
+        return this.keys().map((key: string): { key: string, value: any } => {
+            return { key, value: this.get(key) };
+        });
     }
 
     /**
@@ -98,7 +100,7 @@ export class SessionStorage {
     /**
      * Determine if any of the keys exists in the Storage object.
      *
-     * @param { string | array } keys String containing the name of the key you want to check against
+     * @param { string | string[] } keys String containing the name of the key you want to check against
      *
      * @return { boolean }
      */
@@ -120,7 +122,7 @@ export class SessionStorage {
      * @return { boolean }
      */
     static isEmpty(): boolean {
-        return Object.keys(this.all()).length === 0;
+        return sessionStorage.length === 0;
     }
 
     /**
@@ -135,7 +137,7 @@ export class SessionStorage {
     /**
      * Retrieves all keys from the Storage object.
      *
-     * @return { array }
+     * @return { string[] }
      */
     static keys(): string[] {
         return Object.keys(sessionStorage);
