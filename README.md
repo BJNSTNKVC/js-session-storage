@@ -201,3 +201,39 @@ Print the value associated with a key to the console.
 ```javascript
 SessionStorage.dump('key');
 ```
+
+
+### fake
+
+Replace the Session Storage instance with a fake implementation. This is particularly useful for testing purposes where you want to avoid interacting with the actual browser's Session Storage.
+
+#### Example
+
+```javascript
+SessionStorage.fake();
+```
+
+### restore
+
+Restore the original Session Storage instance. This is typically used after [fake()](#fake) to return to using the real browser's Session Storage.
+
+#### Example
+
+```javascript
+SessionStorage.restore();
+```
+
+### isFake
+
+Check if a fake Session Storage instance is currently being used.
+
+#### Returns
+
+- **boolean** - `true` if a fake instance is being used, `false` otherwise.
+
+#### Example
+
+```javascript
+if (SessionStorage.isFake()) {
+    // ...
+}
