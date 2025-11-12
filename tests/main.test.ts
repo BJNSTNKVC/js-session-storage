@@ -61,27 +61,34 @@ class Storage {
     }
 }
 
-(global as any).sessionStorage = new Storage;
-
 beforeEach((): void => {
-    sessionStorage.clear();
+    (global as any).sessionStorage = new Storage;
+
+    SessionStorage.clear();
+    SessionStorage.restore();
 });
 
 describe('SessionStorage.set', (): void => {
     test('sets the key to the Storage object', (): void => {
-        SessionStorage.set('$key', '$value');
+        const key: string = '$key';
+        const value: string = '$value';
 
-        const item: SessionStorageItem = JSON.parse(sessionStorage.getItem('$key') as string) as SessionStorageItem;
+        SessionStorage.set(key, value);
 
-            expect(item.data).toEqual('$value');
+        const item: SessionStorageItem = JSON.parse(sessionStorage.getItem(key) as string) as SessionStorageItem;
+
+        expect(item.data).toEqual(value);
     });
 
     test('sets the key with a function value to the Storage object', (): void => {
-        SessionStorage.set('$key', (): string => '$value');
+        const key: string = '$key';
+        const value: string = '$value';
 
-        const item: SessionStorageItem = JSON.parse(sessionStorage.getItem('$key') as string) as SessionStorageItem;
+        SessionStorage.set(key, (): string => value);
 
-        expect(item.data).toEqual('$value');
+        const item: SessionStorageItem = JSON.parse(sessionStorage.getItem(key) as string) as SessionStorageItem;
+
+        expect(item.data).toEqual(value);
     });
 });
 
@@ -357,12 +364,89 @@ describe('SessionStorage.count', (): void => {
 describe('SessionStorage.dump', (): void => {
     it('logs the stored item to the console', (): void => {
         const $console: jest.SpyInstance<void, [message?: any, ...optionalParams: any[]]> = jest.spyOn(console, 'log').mockImplementation();
+        const key: string = '$key';
+        const value: string = '$value';
 
-        SessionStorage.set('$key', '$value');
-        SessionStorage.dump('$key');
+        SessionStorage.set(key, value);
+        SessionStorage.dump(key);
 
-        expect($console).toHaveBeenCalledWith('$value');
+        expect($console).toHaveBeenCalledWith(value);
 
         $console.mockRestore();
+    });
+});
+
+describe('SessionStorage.fake', (): void => {
+    test('sets fake as Storage instance', (): void => {
+        SessionStorage.fake();
+
+        expect(SessionStorage.isFake()).toBeTruthy();
+    });
+
+    test('interacts with fake Storage', (): void => {
+        SessionStorage.fake();
+
+        const key: string = '$key';
+        const value: string = '$value';
+
+        SessionStorage.set(key, value);
+
+        expect(SessionStorage.get(key)).toEqual(value);
+        expect(SessionStorage.count()).toEqual(1);
+        expect(SessionStorage.keys()).toContain(key);
+
+        SessionStorage.clear();
+
+        expect(SessionStorage.count()).toEqual(0);
+    });
+
+
+    test('sets new fake instance on multiple calls', (): void => {
+        SessionStorage.fake();
+
+        const key: string = '$key';
+        const value: string = '$value';
+
+        SessionStorage.set(key, value);
+
+        expect(SessionStorage.get(key)).toBe(value);
+        expect(SessionStorage.count()).toBe(1);
+
+        SessionStorage.fake();
+
+        expect(SessionStorage.get(key)).toBeNull();
+        expect(SessionStorage.count()).toBe(0);
+    });
+});
+
+describe('SessionStorage.restore', (): void => {
+    test('restores Storage instance', (): void => {
+        SessionStorage.fake();
+
+        const key: string = '$key';
+        const value: string = '$value';
+
+        SessionStorage.set(key, value);
+
+        SessionStorage.restore();
+
+        expect(SessionStorage.isFake()).toBeFalsy();
+        expect(SessionStorage.get(key)).toBeNull();
+        expect(SessionStorage.count()).toBe(0);
+    });
+});
+
+describe('SessionStorage.isFake', (): void => {
+    test('returns true when fake Storage is set', (): void => {
+        SessionStorage.fake();
+
+        expect(SessionStorage.isFake()).toBe(true);
+    });
+
+    test('returns false when Storage is restored', (): void => {
+        SessionStorage.fake();
+        SessionStorage.restore();
+
+        expect(SessionStorage.isFake()).toBe(false);
     });
 });
