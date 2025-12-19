@@ -1,43 +1,44 @@
 {
   "name": "@bjnstnkvc/session-storage",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Simple wrapper for JavaScript Session Storage API.",
   "type": "module",
   "main": "lib/main.js",
+  "module": "lib/main.esm.js",
   "source": "src/main.ts",
   "types": "src/main.ts",
   "exports": {
-    ".": {
-      "import": "./lib/main.esm.js",
-      "require": "./lib/main.umd.js",
-      "default": "./lib/main.umd.js"
-    }
+	".": {
+	  "import": "./lib/main.esm.js",
+	  "require": "./lib/main.umd.js",
+	  "default": "./lib/main.umd.js"
+	}
   },
   "directories": {
-    "lib": "lib"
+	"lib": "lib"
   },
   "scripts": {
-    "test": "jest --config jestconfig.json ./tests",
-    "build": "rollup -c"
+	"test": "jest --config jestconfig.json ./tests",
+	"build": "rollup -c"
   },
   "repository": {
-    "type": "git",
-    "url": "git+https://github.com/BJNSTNKVC/js-session-storage.git"
+	"type": "git",
+	"url": "git+https://github.com/BJNSTNKVC/js-session-storage.git"
   },
   "keywords": [
-    "storage"
+	"storage"
   ],
   "author": "Bojan Stankovic",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/BJNSTNKVC/js-session-storage/issues"
+	"url": "https://github.com/BJNSTNKVC/js-session-storage/issues"
   },
   "homepage": "https://github.com/BJNSTNKVC/js-session-storage#readme",
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^28.0.6",
-    "@rollup/plugin-node-resolve": "^16.0.1",
-    "@rollup/plugin-terser": "^0.4.4",
-    "@types/jest": "^29.5.14",
+	"@rollup/plugin-commonjs": "^28.0.6",
+	"@rollup/plugin-node-resolve": "^16.0.1",
+	"@rollup/plugin-terser": "^0.4.4",
+	"@types/jest": "^29.5.14",
 	"@types/node": "^20.19.17",
 	"jest": "^29.7.0",
 	"jest-environment-jsdom": "^29.7.0",
