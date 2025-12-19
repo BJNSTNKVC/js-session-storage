@@ -134,6 +134,20 @@ Check if a key exists in the Session Storage.
 SessionStorage.has('key');
 ```
 
+### missing
+
+Check if a key does not exist in the Local Storage.
+
+#### Parameters
+
+- **key** - String containing the name of the key to be checked.
+
+#### Example
+
+```javascript
+SessionStorage.missing('key');
+```
+
 ### hasAny
 
 Check if any of the provided keys exist in the Session Storage.
@@ -227,13 +241,184 @@ SessionStorage.restore();
 
 Check if a fake Session Storage instance is currently being used.
 
-#### Returns
-
-- **boolean** - `true` if a fake instance is being used, `false` otherwise.
-
 #### Example
 
 ```javascript
 if (SessionStorage.isFake()) {
     // ...
 }
+```
+
+## Events
+
+In case you would like to execute a callback on Local Storage operation, you may listen for various events dispatched by
+the Local Storage.
+
+| Type            | Event           |
+|-----------------|-----------------|
+| `retrieving`    | RetrievingKey   |
+| `hit`           | KeyHit          |
+| `missed`        | KeyMissed       |
+| `writing`       | WritingKey      |
+| `written`       | KeyWritten      |
+| `write-failed`  | KeyWriteFailed  |
+| `forgot`        | KeyForgotten    |
+| `forgot-failed` | KeyForgotFailed |
+| `flushing`      | StorageFlushing |
+| `flushed`       | StorageFlushed  |
+
+### listen
+
+Register an event listener for one or more storage events.
+
+#### Parameters
+
+- **events** - String or an object of strings containing the type and a callback function.
+- **callback** - Function to be executed when the event is dispatched in case an event is passed as a string.
+
+#### Example
+
+```javascript
+SessionStorage.listen('retrieving', (event) => {
+    console.log(event);
+});
+```
+
+In case you would like to register multiple events, you can pass an object containing the type and a callback function:
+
+```javascript
+SessionStorage.listen({
+    'retrieving': (event) => {
+        // ...
+    },
+    'hit': (event) => {
+        // ...
+    },
+    'missed': (event) => {
+        // ...
+    },
+    'writing': (event) => {
+        // ...
+    },
+    'written': (event) => {
+        // ...
+    },
+    'write-failed': (event) => {
+        // ...
+    },
+    'forgot': (event) => {
+        // ...
+    },
+    'forgot-failed': (event) => {
+        // ...
+    },
+    'flushing': (event) => {
+        // ...
+    },
+    'flushed': (event) => {
+        // ...
+    },
+});
+```
+
+Conveniently, you can also use the following methods to register event listeners for a specific event:
+
+### onRetrieving
+
+Triggered when a key is about to be retrieved from storage.
+
+```javascript
+SessionStorage.onRetrieving((event) => {
+  // ...
+});
+```
+
+### onHit
+
+Triggered when a requested key is found in the storage.
+
+```javascript
+SessionStorage.onHit((event) => {
+  // ...
+});
+```
+
+### onMissed
+
+Triggered when a requested key is not found in the storage.
+
+```javascript
+SessionStorage.onMissed((event) => {
+  // ...
+});
+```
+
+### onWriting
+
+Triggered when a key is about to be written to storage.
+
+```javascript
+SessionStorage.onWriting((event) => {
+  // ...
+});
+```
+
+### onWritten
+
+Triggered after a key has been successfully written to storage.
+
+```javascript
+SessionStorage.onWritten((event) => {
+  // ...
+});
+```
+
+### onWriteFailed
+
+Triggered when writing a key to storage fails.
+
+```javascript
+SessionStorage.onWriteFailed((event) => {
+  // ...
+});
+```
+
+### onForgot
+
+Triggered when a key is successfully removed from storage.
+
+```javascript
+SessionStorage.onForgot((event) => {
+  // ...
+});
+```
+
+### onForgotFailed
+
+Triggered when removing a key from storage fails.
+
+```javascript
+SessionStorage.onForgotFailed((event) => {
+  // ...
+});
+```
+
+### onFlushing
+
+Triggered when the storage is about to be cleared.
+
+```javascript
+SessionStorage.onFlushing((event) => {
+  // ...
+});
+```
+
+### onFlushed
+
+Triggered after the storage has been successfully cleared.
+
+```javascript
+SessionStorage.onFlushed((event) => {
+    // ...
+});
+```
