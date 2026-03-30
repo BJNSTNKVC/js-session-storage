@@ -182,15 +182,7 @@ export class SessionStorage {
      * @return { boolean }
      */
     static hasAny(...keys: [string | string[]] | string[]): boolean {
-        if (keys.length === 1) {
-            if (Array.isArray(keys[0])) {
-                keys = keys[0];
-            } else {
-                keys = [keys[0]];
-            }
-        }
-
-        return keys.some((key: string): boolean => this.has(key));
+        return keys.flat().some((key: string): boolean => this.has(key));
     }
 
     /**
