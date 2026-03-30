@@ -136,7 +136,7 @@ SessionStorage.has('key');
 
 ### missing
 
-Check if a key does not exist in the Local Storage.
+Check if a key does not exist in the Session Storage.
 
 #### Parameters
 
@@ -251,8 +251,8 @@ if (SessionStorage.isFake()) {
 
 ## Events
 
-In case you would like to execute a callback on Local Storage operation, you may listen for various events dispatched by
-the Local Storage.
+In case you would like to execute a callback on Session Storage operation, you may listen for various events dispatched by
+the Session Storage.
 
 | Type            | Event           |
 |-----------------|-----------------|
