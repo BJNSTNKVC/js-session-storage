@@ -1,6 +1,6 @@
 {
   "name": "@bjnstnkvc/session-storage",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Simple wrapper for JavaScript Session Storage API.",
   "type": "module",
   "main": "lib/main.js",
@@ -9,6 +9,7 @@
   "types": "src/main.ts",
   "exports": {
     ".": {
+      "types": "./src/main.ts",
       "import": "./lib/main.esm.js",
       "require": "./lib/main.umd.js",
       "default": "./lib/main.umd.js"
@@ -18,7 +19,9 @@
     "lib": "lib"
   },
   "scripts": {
+    "typecheck": "tsc --noEmit",
     "test": "jest --config jestconfig.json ./tests",
+    "coverage": "jest --config jestconfig.json ./tests --coverage",
     "build": "rollup -c"
   },
   "repository": {
