@@ -102,8 +102,8 @@ describe('SessionStorageFake.setItem', (): void => {
             storage.setItem(key, value);
         } catch (error) {
             expect(error).toBeInstanceOf(DOMException);
-            expect(error.name).toBe('QuotaExceededError');
-            expect(error.message).toContain(`Failed to execute 'setItem' on 'Storage': Setting the value of '${key}' exceeded the quota.`);
+            expect((error as DOMException).name).toBe('QuotaExceededError');
+            expect((error as DOMException).message).toContain(`Failed to execute 'setItem' on 'Storage': Setting the value of '${key}' exceeded the quota.`);
         }
     });
 });
