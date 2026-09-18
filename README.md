@@ -44,6 +44,19 @@ Set the value for a given key in the Session Storage.
 SessionStorage.set('key', 'value'); 
 ```
 
+You can also pass a closure as the value. The closure will be executed and its result stored:
+
+```javascript
+SessionStorage.set('key', () => 'value');
+```
+
+If the closure is asynchronous, the value is stored once the returned Promise resolves. In this case, the `set` method
+returns a Promise that resolves to `true` or `false`, depending on whether the value was stored:
+
+```javascript
+await SessionStorage.set('key', async () => await fetchValue());
+```
+
 ### get
 
 Retrieve the value associated with the given key from the Session Storage.
@@ -67,6 +80,13 @@ This allows you to lazily load default values from other sources:
 SessionStorage.get('key', () => 'default');
 ````
 
+The closure can also be asynchronous. If the specified item is not found, the Promise returned by the closure is returned.
+Since an existing item is returned directly, it is best to always `await` the result:
+
+```javascript
+await SessionStorage.get('key', async () => await fetchDefault());
+````
+
 ### remember
 
 Retrieve the value associated with the given key, or execute the given callback and store the result in the Session
@@ -75,12 +95,20 @@ Storage.
 #### Parameters
 
 - **key** - String containing the name of the key.
-- **fallback** - Function you want to execute.
+- **callback** - Function you want to execute.
 
 #### Example
 
 ```javascript
 SessionStorage.remember('key', () => 'default');
+````
+
+The callback can also be asynchronous. If the specified item is not found, the result is stored once the returned Promise
+resolves, and a Promise resolving to the stored value is returned. Since an existing item is returned directly, it is
+best to always `await` the result:
+
+```javascript
+await SessionStorage.remember('key', async () => await fetchDefault());
 ````
 
 ### all
