@@ -60,6 +60,52 @@ describe('SessionStorage.set', (): void => {
         expect(item.data).toEqual(value);
     });
 
+    test('sets the key with an async function value to the Storage object', async (): Promise<void> => {
+        const key: string = '$key';
+        const value: string = '$value';
+
+        const result: Promise<boolean> = SessionStorage.set(key, async (): Promise<string> => value);
+
+        expect(result).toBeInstanceOf(Promise);
+        expect(sessionStorage.getItem(key)).toBeNull();
+        expect(await result).toBeTruthy();
+
+        const item: SessionStorageItem = JSON.parse(sessionStorage.getItem(key) as string) as SessionStorageItem;
+
+        expect(item.data).toEqual(value);
+    });
+
+    test('resolves to false in case async function value cannot be set', async (): Promise<void> => {
+        const key: string = '$key';
+        const value: string = 'x'.repeat(5 * 1024 * 1024);
+
+        expect(await SessionStorage.set(key, async (): Promise<string> => value)).toBeFalsy();
+    });
+
+    test('does not set the key in case async function value rejects', async (): Promise<void> => {
+        const key: string = '$key';
+
+        await expect(SessionStorage.set(key, async (): Promise<string> => {
+            throw new Error('$error');
+        })).rejects.toThrow('$error');
+
+        expect(sessionStorage.getItem(key)).toBeNull();
+        expect(events.has('session-storage:writing')).toBeFalsy();
+    });
+
+    test('emits WritingKey and KeyWritten events with the resolved async function value', async (): Promise<void> => {
+        const key: string = '$key';
+        const value: string = '$value';
+
+        await SessionStorage.set(key, async (): Promise<string> => value);
+
+        const writing: WritingKey = events.get('session-storage:writing') as WritingKey;
+        const written: KeyWritten = events.get('session-storage:written') as KeyWritten;
+
+        expect(writing.value).toBe(value);
+        expect(written.value).toBe(value);
+    });
+
     test('returns false in case value cannot be set', (): void => {
         const key: string = '$key';
         const value: string = 'x'.repeat(5 * 1024 * 1024);
@@ -139,6 +185,24 @@ describe('SessionStorage.get', (): void => {
 
     test('returns fallback function result if key does not exist in Storage', (): void => {
         expect(SessionStorage.get('$key', (): string => 'fallback')).toEqual('fallback');
+    });
+
+    test('returns async fallback function result if key does not exist in Storage', async (): Promise<void> => {
+        const result: Promise<string> = SessionStorage.get('$key', async (): Promise<string> => 'fallback');
+
+        expect(result).toBeInstanceOf(Promise);
+        expect(await result).toEqual('fallback');
+    });
+
+    test('does not execute async fallback function if key exists in Storage', async (): Promise<void> => {
+        const key: string = '$key';
+        const value: string = '$value';
+        const fallback: jest.Mock = jest.fn(async (): Promise<string> => 'fallback');
+
+        SessionStorage.set(key, value);
+
+        expect(await SessionStorage.get(key, fallback)).toEqual(value);
+        expect(fallback).not.toHaveBeenCalled();
     });
 
     test('returns null if key does not exist and no fallback is provided', (): void => {
@@ -222,6 +286,35 @@ describe('SessionStorage.remember', (): void => {
 
         expect(SessionStorage.remember(key, (): string => value)).toEqual(value);
         expect(SessionStorage.get(key)).toEqual(value);
+    });
+
+    test('stores and returns the result of the async callback if key does not exist', async (): Promise<void> => {
+        const key: string = '$key';
+        const value: string = '$value';
+
+        const result: Promise<string> = SessionStorage.remember(key, async (): Promise<string> => value);
+
+        expect(result).toBeInstanceOf(Promise);
+        expect(await result).toEqual(value);
+        expect(SessionStorage.get(key)).toEqual(value);
+    });
+
+    test('returns the value for a key in Storage without executing the async callback', async (): Promise<void> => {
+        const key: string = '$key';
+        const value: string = '$value';
+        const callback: jest.Mock = jest.fn(async (): Promise<string> => 'fallback');
+
+        SessionStorage.set(key, value);
+
+        expect(await SessionStorage.remember(key, callback)).toEqual(value);
+        expect(callback).not.toHaveBeenCalled();
+    });
+
+    test('resolves to null in case the async callback result cannot be stored', async (): Promise<void> => {
+        const key: string = '$key';
+        const value: string = 'x'.repeat(5 * 1024 * 1024);
+
+        expect(await SessionStorage.remember(key, async (): Promise<string> => value)).toBeNull();
     });
 });
 

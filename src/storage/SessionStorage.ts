@@ -30,33 +30,31 @@ export class SessionStorage {
     /**
      * Set the key to the Storage object.
      *
+     * In case the value is an asynchronous function, the key is set once its result
+     * resolves and the returned Promise resolves with the outcome of the operation.
+     *
      * @param { string } key
      * @param { * } value
      *
-     * @return { boolean }
+     * @return { boolean | Promise<boolean> }
      */
-    static set(key: string, value: any): boolean {
-        const item: SessionStorageItem = {
-            data: typeof value === 'function' ? value() : value,
-        };
+    static set(key: string, value: () => Promise<any>): Promise<boolean>;
+    static set(key: string, value: any): boolean;
+    static set(key: string, value: any): boolean | Promise<boolean> {
+        const data: any = typeof value === 'function' ? value() : value;
 
-        this.emit(new WritingKey(key, item.data));
-
-        try {
-            this.#storage.setItem(key, JSON.stringify(item));
-
-            this.emit(new KeyWritten(key, item.data));
-        } catch {
-            this.emit(new KeyWriteFailed(key, item.data));
-
-            return false;
+        if (data instanceof Promise) {
+            return data.then((data: any): boolean => this.write(key, data));
         }
 
-        return true;
+        return this.write(key, data);
     }
 
     /**
      * Get the key from the Storage object.
+     *
+     * In case the key does not exist and the fallback is an asynchronous function,
+     * the Promise returned by the fallback is returned.
      *
      * @param { string } key
      * @param { string | Function | null } fallback
@@ -92,19 +90,24 @@ export class SessionStorage {
     /**
      * Get the key from the Storage, or execute the given callback and store the result.
      *
+     * In case the key does not exist and the callback is an asynchronous function,
+     * a Promise resolving with the stored value is returned.
+     *
      * @param { string } key
      * @param { Function } callback
      *
      * @return { any }
      */
     static remember(key: string, callback: Function): any {
-        const item: string | null = this.get(key);
+        const item: any = this.get(key);
 
-        if (item === null) {
-            this.set(key, callback);
+        if (item !== null) {
+            return item;
         }
 
-        return item ?? this.get(key);
+        const written = this.set(key, callback) as boolean | Promise<boolean>;
+
+        return written instanceof Promise ? written.then((): any => this.get(key)) : this.get(key);
     }
 
     /**
@@ -395,6 +398,32 @@ export class SessionStorage {
      */
     static onFlushed(listener: (event: StorageFlushed) => void): void {
         this.listen('flushed', listener);
+    }
+
+    /**
+     * Write the resolved value for the key to the Storage object.
+     *
+     * @param { string } key
+     * @param { * } data
+     *
+     * @return { boolean }
+     */
+    private static write(key: string, data: any): boolean {
+        const item: SessionStorageItem = { data };
+
+        this.emit(new WritingKey(key, item.data));
+
+        try {
+            this.#storage.setItem(key, JSON.stringify(item));
+
+            this.emit(new KeyWritten(key, item.data));
+        } catch {
+            this.emit(new KeyWriteFailed(key, item.data));
+
+            return false;
+        }
+
+        return true;
     }
 
     /**
